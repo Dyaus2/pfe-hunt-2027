@@ -75,7 +75,8 @@ function build(C) {
   C.skills.forEach(([k, v]) => kids.push(p([t(k + ": ", { bold: true }), t(v)], { spacing: { after: 10 } })));
 
   kids.push(heading(C.h.cert));
-  C.certs.forEach((c) => kids.push(bullet(c)));
+  // PUBLIC_CV=1 → drop placeholder lines (used for the public portfolio downloads)
+  C.certs.filter((c) => !(process.env.PUBLIC_CV && /PLACEHOLDER|À COMPLÉTER/.test(c))).forEach((c) => kids.push(bullet(c)));
 
   kids.push(heading(C.h.lang));
   kids.push(p([t(C.languages)]));
