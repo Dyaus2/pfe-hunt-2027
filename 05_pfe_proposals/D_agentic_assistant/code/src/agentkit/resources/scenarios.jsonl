@@ -1,0 +1,12 @@
+{"id": "s01", "query": "What does fault E102 mean?", "expected_tools": ["lookup_fault_code"], "must_contain": ["vibration", "P1"], "approve": false}
+{"id": "s02", "query": "Explain error code E210 please", "expected_tools": ["lookup_fault_code"], "must_contain": ["Oil change", "P3"], "approve": false}
+{"id": "s03", "query": "What is code E999?", "expected_tools": ["lookup_fault_code"], "must_contain": ["Unknown"], "approve": false}
+{"id": "s04", "query": "What is the vibration limit for pump P-200 before I must stop it?", "expected_tools": ["search_manual"], "must_contain": ["7.1"], "approve": false}
+{"id": "s05", "query": "How often should I change the compressor C-110 oil?", "expected_tools": ["search_manual"], "must_contain": ["4000"], "approve": false}
+{"id": "s06", "query": "What is the maximum bearing temperature on motors?", "expected_tools": ["search_manual"], "must_contain": ["85"], "approve": false}
+{"id": "s07", "query": "When must heat exchanger E-301 be cleaned?", "expected_tools": ["search_manual"], "must_contain": ["5 degrees"], "approve": false}
+{"id": "s08", "query": "Compute 4000*3", "expected_tools": ["calculator"], "must_contain": ["12000"], "approve": false}
+{"id": "s09", "query": "Create a work order for fault E205", "expected_tools": ["lookup_fault_code", "create_work_order"], "must_contain": ["WO-", "P1", "C-110"], "approve": true}
+{"id": "s10", "query": "Open a ticket for E330", "expected_tools": ["lookup_fault_code", "create_work_order"], "must_contain": ["NOT created", "P2"], "approve": false}
+{"id": "s11", "query": "Tell me a joke", "expected_tools": [], "must_contain": ["only answers"], "approve": false}
+{"id": "s12", "query": "Create a work order for the pump", "expected_tools": [], "must_contain": ["fault code"], "approve": true}

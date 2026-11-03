@@ -1,0 +1,7 @@
+scikit-learn>=1.4
+pandas>=2
+numpy
+joblib
+matplotlib
+pytest
+# optional [GPU — Colab T4]: torch sentence-transformers transformers

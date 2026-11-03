@@ -1,0 +1,21 @@
+{
+  "_note": "SYNTHETIC demo knowledge base (fictional ACME plant). Replace with the host's procedures in the PFE.",
+  "passages": [
+    {"id": "PROC-01", "title": "Pump P-200 start-up", "text": "Before starting pump P-200, open the suction valve fully, check that the casing is primed, then start the motor and open the discharge valve slowly within 30 seconds."},
+    {"id": "PROC-02", "title": "Pump P-200 vibration limits", "text": "Normal vibration for pump P-200 is below 4.5 mm/s RMS. Between 4.5 and 7.1 mm/s schedule an inspection within 7 days. Above 7.1 mm/s stop the pump and inspect bearings."},
+    {"id": "PROC-03", "title": "Compressor C-110 oil change", "text": "Change the oil of compressor C-110 every 4000 operating hours using ISO VG 46 oil. Drain while warm and replace the oil filter at each change."},
+    {"id": "PROC-04", "title": "Conveyor B-7 belt tension", "text": "Check conveyor B-7 belt tension weekly. Belt sag must not exceed 2 percent of the span between idlers."},
+    {"id": "PROC-05", "title": "Lockout-tagout", "text": "Before any maintenance, isolate all energy sources, apply a personal lock and tag, and verify zero energy by attempting a start."},
+    {"id": "PROC-06", "title": "Bearing temperature", "text": "Bearing temperature on motors must stay below 85 degrees Celsius. Above 95 degrees Celsius trip the motor and inspect lubrication."},
+    {"id": "PROC-07", "title": "Heat exchanger E-301 cleaning", "text": "Clean heat exchanger E-301 when the approach temperature rises by more than 5 degrees Celsius above the clean baseline."},
+    {"id": "PROC-08", "title": "Work order priorities", "text": "Priority P1 means safety risk or production stop, fix within 4 hours. P2 means degraded operation, fix within 24 hours. P3 is planned maintenance within 7 days."}
+  ],
+  "fault_codes": {
+    "E101": {"asset": "P-200", "description": "Suction pressure low", "severity": "P2", "action": "Check suction valve and strainer for blockage."},
+    "E102": {"asset": "P-200", "description": "High vibration above 7.1 mm/s", "severity": "P1", "action": "Stop the pump and inspect bearings."},
+    "E205": {"asset": "C-110", "description": "Oil pressure low", "severity": "P1", "action": "Stop the compressor and check oil level and pump."},
+    "E210": {"asset": "C-110", "description": "Oil change due", "severity": "P3", "action": "Schedule oil change with ISO VG 46 oil."},
+    "E330": {"asset": "B-7", "description": "Belt misalignment", "severity": "P2", "action": "Realign belt and check idlers."},
+    "E401": {"asset": "E-301", "description": "Fouling suspected", "severity": "P3", "action": "Plan cleaning of heat exchanger."}
+  }
+}
