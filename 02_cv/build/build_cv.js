@@ -14,6 +14,10 @@ const RIGHT = 10466; // A4 width 11906 - margins 720*2
 
 const p = (children, opts = {}) => new Paragraph({ children, ...opts });
 const t = (text, o = {}) => new TextRun({ text, font: FONT, size: SZ, ...o });
+// rich text: string, or [[text, url?], ...] — segments with a url become clickable links
+const rich = (x, o = {}) => (typeof x === "string" ? [t(x, o)] : x.map(([text, url]) => (url
+  ? new ExternalHyperlink({ link: url, children: [t(text, { ...o, color: "1F4E99", underline: {} })] })
+  : t(text, o))));
 
 function heading(text) {
   return p([t(text, { bold: true, size: 21, color: "1F3864" })], {
@@ -24,7 +28,7 @@ function heading(text) {
 }
 
 function titleLine(left, right, bold = true, italic = false) {
-  const kids = [t(left, { bold, italics: italic })];
+  const kids = rich(left, { bold, italics: italic });
   if (right) kids.push(t("\t" + right, { bold: false, italics: italic }));
   return p(kids, {
     tabStops: [{ type: TabStopType.RIGHT, position: RIGHT }],
@@ -34,7 +38,7 @@ function titleLine(left, right, bold = true, italic = false) {
 }
 
 function bullet(text) {
-  return p([t(text)], { numbering: { reference: "bullets", level: 0 }, spacing: { after: 10 } });
+  return p(rich(text), { numbering: { reference: "bullets", level: 0 }, spacing: { after: 10 } });
 }
 
 function entry(e) {
@@ -49,7 +53,7 @@ function build(C) {
   const kids = [];
   kids.push(p([t(C.name, { bold: true, size: 36 })], { alignment: AlignmentType.CENTER, spacing: { after: 0 } }));
   kids.push(p([t(C.headline, { bold: true, size: 21, color: "1F3864" })], { alignment: AlignmentType.CENTER, spacing: { after: 20 } }));
-  kids.push(p([t(C.contact, { size: 18 })], { alignment: AlignmentType.CENTER, spacing: { after: 40 } }));
+  kids.push(p(rich(C.contact, { size: 18 }), { alignment: AlignmentType.CENTER, spacing: { after: 40 } }));
   kids.push(p([t(C.seeking, { bold: true, size: 20 })], {
     alignment: AlignmentType.CENTER, spacing: { after: 0 },
     shading: { type: "clear", fill: "E8EEF7", color: "auto" },
@@ -75,8 +79,7 @@ function build(C) {
   C.skills.forEach(([k, v]) => kids.push(p([t(k + ": ", { bold: true }), t(v)], { spacing: { after: 10 } })));
 
   kids.push(heading(C.h.cert));
-  // PUBLIC_CV=1 → drop placeholder lines (used for the public portfolio downloads)
-  C.certs.filter((c) => !(process.env.PUBLIC_CV && /PLACEHOLDER|À COMPLÉTER/.test(c))).forEach((c) => kids.push(bullet(c)));
+  C.certs.forEach((c) => kids.push(bullet(c)));
 
   kids.push(heading(C.h.lang));
   kids.push(p([t(C.languages)]));

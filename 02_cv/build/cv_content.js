@@ -1,15 +1,28 @@
 // Single source of truth for CV content (EN + FR).
-// Rule: only facts from Resume_pfe.pdf or stated by Hazem. No inflation.
+// Rule: only facts from Hazem's own CVs (latest: Hazem_Ilahi_Resume_EN/French.pdf, Nov 2026) or verified project results. No inflation.
+// Rich text: a string, or an array of segments [text, url?] (url → hyperlink).
 
-const contact = "Tunis, Tunisia | +216 97 111 410 | hazem.ilahi@esprit.tn | linkedin.com/in/hazem-ilahi-016a7a315 | github.com/Dyaus2";
-const contactFr = "Tunis, Tunisie | +216 97 111 410 | hazem.ilahi@esprit.tn | linkedin.com/in/hazem-ilahi-016a7a315 | github.com/Dyaus2";
+const L = {
+  mail: "mailto:hazem.ilahi@esprit.tn",
+  linkedin: "https://linkedin.com/in/hazem-ilahi-016a7a315",
+  github: "https://github.com/Dyaus2",
+  site: "https://dyaus2.github.io/",
+  credly: "https://www.credly.com/earner/earned/badge/64339ed0-debf-40c3-8ec5-70c4a48f495b",
+  twDemo: "https://dyaus2.github.io/turbowatch/",
+  twRepo: "https://github.com/Dyaus2/turbowatch",
+};
+
+const contact = (city) => [
+  [`${city} | +216 97 111 410 | `], ["hazem.ilahi@esprit.tn", L.mail], [" | "], ["linkedin.com/in/hazem-ilahi-016a7a315", L.linkedin],
+  [" | "], ["github.com/Dyaus2", L.github], [" | "], ["dyaus2.github.io", L.site],
+];
 
 const EN = {
   name: "Hazem Ilahi",
   headline: "Data Science & AI Engineering Student — Machine Learning | MLOps | LLM / RAG",
   seeking: "Seeking 6-month end-of-studies internship (PFE), from Jan/Feb 2027 — open to relocation",
   seekingSub: "Mandatory curricular internship — tripartite internship agreement signed by ESPRIT",
-  contact,
+  contact: contact("Tunis, Tunisia"),
   h: { profile: "PROFILE", exp: "EXPERIENCE", proj: "PROJECTS", skills: "TECHNICAL SKILLS", edu: "EDUCATION", cert: "CERTIFICATIONS", lang: "LANGUAGES" },
   profile:
     "Final-year engineering student in Data Science & AI at ESPRIT (graduating 2027) with hands-on experience in machine learning, MLOps and LLM/RAG systems. " +
@@ -46,16 +59,40 @@ const EN = {
   ],
   projects: [
     {
-      title: "Garage Augmenté — Multi-agent RAG assistant for automotive pre-diagnosis",
+      // numbers: github.com/Dyaus2/turbowatch results/ (RESULTS.md, DRIFT.md, COPILOT.md, COPILOT_BROWSER.md)
+      title: "TurboWatch — Predictive maintenance copilot for turbofan engines",
+      right: "2026",
+      sub: [["Personal project — live demo: "], ["dyaus2.github.io/turbowatch", L.twDemo], [" · code: "], ["github.com/Dyaus2/turbowatch", L.twRepo]],
+      bullets: [
+        "Remaining-useful-life prediction on NASA C-MAPSS turbofan data: gradient boosting with a P10–P90 band and a 1D-CNN (PyTorch) on causal, regime-normalized features shared by training and serving; test RUL RMSE 15.5 cycles (CNN) / 16.3 (GBM), mean of 5 seeds, engine-grouped splits.",
+        "Calibrated risk and a k-of-n alarm policy tuned on a cost matrix: 97% of test-set failures detected a median 36 cycles ahead at a 2% false-alarm rate; SHAP explanation for every prediction.",
+        "RAG maintenance copilot over FAA/NASA documents (bge-small + BM25, RRF, cross-encoder reranking): cited answers, refusal when out of scope; correct passage ranked first on 26/26 test questions, also when running fully in the browser (transformers.js).",
+        "MLOps and delivery: MLflow, PSI drift detection with champion/challenger retraining (FD003 test RMSE 20.7 → 15.0), FastAPI + React/TypeScript dashboard with live replay, Docker, GitHub Actions CI.",
+      ],
+      stack: "Stack: Python, scikit-learn, PyTorch, SHAP, MLflow, FastAPI, sentence-transformers, React, TypeScript, Docker",
+    },
+    {
+      title: "UnderHood (Garage Augmenté) — Multi-agent RAG assistant for automotive pre-diagnosis",
       right: "2026 – 2027",
       sub: "ESPRIT team project — owner of the knowledge base and retrieval layer",
       bullets: [
-        "Modular RAG pipeline on Qdrant: multilingual query expansion (French, English, Tunisian Arabic), hybrid dense BGE-M3 + BM25 retrieval fused by reciprocal rank fusion, brand/model/year filtering, cross-encoder reranking and exact lookup of 9,533 OBD fault codes.",
-        "7 resumable Python collectors (XML catalogs, JSON APIs, sitemaps, Next.js data routes): 2,019 unique owner's manuals (≈697,000 pages, 26 brands), 73% from official manufacturer sources, covering 54 of 56 priority models chosen from a Tunisian car-market study (2015–2026 registrations).",
-        "Corpus preparation: SHA-256 deduplication, Tesseract OCR of ≈18,500 pages, vehicle metadata normalized into 364 model families, topic tagging; main index of 98,000 units (≈39M tokens).",
-        "FastAPI service for the n8n workflow, ablation benchmark (hit@k, MRR) and documented hand-off package (Docker Compose, ingestion and evaluation scripts) for the GPU host.",
+        "Corpus: 7 resumable Python collectors gathering 2,019 owner's manuals (≈697,000 pages, 26 brands, 73% official sources), covering 54 of the 56 priority models of the Tunisian market. SHA-256 deduplication, Tesseract OCR (≈18,500 pages), 364 model families, Qdrant index of 101,417 passages.",
+        "Retrieval: query expansion in French / English / Tunisian Derja plus LLM query rewriting, hybrid BGE-M3 + BM25 search (RRF), brand/model/year filtering, cross-encoder reranking and exact lookup of 9,533 OBD-II codes, all exposed as a FastAPI service to the diagnostic agent (LangGraph).",
+        "Evaluation: ablation on 40 questions (hit@5, MRR, double-blind LLM judging): the vehicle filter raises the share of correct answers found in the right manual from 0% to 72% (MRR 0.63).",
       ],
-      stack: "Stack: Python, Qdrant, BGE-M3, BM25, PyMuPDF, Tesseract, FastAPI, Docker Compose, n8n",
+      stack: "Stack: Python, Qdrant, BGE-M3, BM25, FastAPI, LangGraph, PyMuPDF, Tesseract",
+    },
+    {
+      title: "DressMe — Smart personal fashion assistant for the Tunisian market",
+      right: "2026 – 2027",
+      sub: "ESPRIT team project (7 people, Advanced Data Science Project) — from design to working prototype (API + mobile app)",
+      bullets: [
+        "Style representation: benchmarked encoders on Polyvore (152,785 items, 95% bootstrap CIs). Chose Qwen3-VL-Embedding-2B, as accurate as the 8B model but 3.7× faster. \"Fashion DNA\" learned by a Set Transformer trained contrastively (InfoNCE).",
+        "Personalized outfits: compatibility head per category pair (AUC 0.852 vs 0.830 for cosine alone). Beam-search generation conditioned on weather and occasion. Personalization by Thompson sampling with a population prior, evaluated on 40 simulated personas over 60 days.",
+        "Vision and generative AI: SAM 3 segmentation and garment recognition from photos (96.6% accuracy in auto-fill). Diffusion-based virtual try-on (Qwen Image Edit via ComfyUI). Local LLM stylist (Qwen 9B) with every sentence checked against facts: 199 of 200 answers grounded.",
+        "Explainable AI and marketplace: exact per-criterion contributions to the score; occlusion maps evaluated for faithfulness (deletion/insertion curves); concepts shown only above 0.85 AUC; second-hand prices predicted by quantile LightGBM with conformal calibration (80.0% coverage on 423k listings), explained with TreeSHAP.",
+      ],
+      stack: "Stack: Python, PyTorch, FastAPI, LightGBM, llama.cpp, React Native (Expo)",
     },
     {
       title: "Kadastra — AI real-estate intelligence platform",
@@ -75,15 +112,6 @@ const EN = {
       ],
     },
     {
-      title: "DressMe — Smart personal fashion assistant for the Tunisian market",
-      right: "2026 – 2027",
-      sub: "ESPRIT team project (Advanced Data Science Project) — design phase, Design Thinking",
-      bullets: [
-        "User research (17-respondent survey, 6 personas) turned into 5 business and data-science objectives with metrics and a 3-version roadmap; designed a 5-layer architecture (FastAPI gateway, Redis Streams, PostgreSQL/FAISS).",
-        "Specified 6 ML pipelines (YOLO + SAM 2 + Qwen3-VL ingestion, BPR outfit compatibility on Polyvore, Two-Tower + LightGBM recommender, ReAct resale agent) and an explainability strategy (TreeSHAP, LIME, counterfactuals).",
-      ],
-    },
-    {
       title: "Time-series forecasting — U.S. construction spending",
       right: "2026",
       sub: "Statistical modeling project in R",
@@ -96,7 +124,7 @@ const EN = {
     ["Programming", "Python, R, SQL, C/C++, Java, PHP"],
     ["ML / DL", "scikit-learn, XGBoost, PyTorch, TensorFlow, Keras; anomaly detection, classification, probability calibration, grouped cross-validation; computer vision (CNN, ViT, CLIP, BLIP); time-series forecasting (ARIMA/SARIMA)"],
     ["LLM / RAG / NLP", "RAG pipelines, Qdrant, BGE-M3 embeddings, BM25, hybrid search, cross-encoder reranking, retrieval evaluation (hit@k, MRR), Transformers"],
-    ["MLOps", "automated retraining, model registry, champion/challenger deployment, drift monitoring (PSI), quality gates, canary deployment and rollback, pytest"],
+    ["MLOps", "automated retraining, model registry, MLflow, champion/challenger deployment, drift monitoring (PSI), quality gates, canary deployment and rollback, pytest"],
     ["Data", "pandas, NumPy, ETL, web scraping, OCR (Tesseract), SQLite, Power BI, Tableau"],
     ["Cloud & deployment", "AWS (Cloud Foundations), Docker, Docker Compose, FastAPI, Django, Flask, Spring Boot, Symfony, REST APIs, n8n, Git"],
     ["Methods", "Microsoft TDSP, CRISP-DM, Design Thinking, Agile/Scrum"],
@@ -116,12 +144,11 @@ const EN = {
     },
   ],
   certs: [
-    "AWS Cloud Foundations — Amazon Web Services (badge, Nov 2026)",
+    [["AWS Cloud Foundations — Amazon Web Services (badge, Nov 2026) — "], ["verify on Credly", L.credly]],
     "Fundamentals of Deep Learning — NVIDIA (2026)",
     "Applications of AI for Anomaly Detection — NVIDIA (2026)",
     "Building Transformer-Based Natural Language Processing Applications — NVIDIA (2026)",
     "CCNA 2: Switching, Routing, and Wireless Essentials (SRWE) — Cisco Networking Academy (2025)",
-    "[PLACEHOLDER — 3 Hedera certifications, expected Dec 2026: replace with exact titles once issued, or delete before sending]",
   ],
   languages: "English: fluent | French: advanced (professional working proficiency) | Arabic: native",
 };
@@ -131,7 +158,7 @@ const FR = {
   headline: "Élève ingénieur en Data Science & IA — Machine Learning | MLOps | LLM / RAG",
   seeking: "Recherche un stage de fin d'études (PFE) de 6 mois à partir de janvier/février 2027 — mobilité internationale",
   seekingSub: "Stage obligatoire du cursus — convention de stage tripartite signée par ESPRIT",
-  contact: contactFr,
+  contact: contact("Tunis, Tunisie"),
   h: { profile: "PROFIL", exp: "EXPÉRIENCE PROFESSIONNELLE", proj: "PROJETS", skills: "COMPÉTENCES TECHNIQUES", edu: "FORMATION", cert: "CERTIFICATIONS", lang: "LANGUES" },
   profile:
     "Élève ingénieur en dernière année à ESPRIT (diplôme prévu en 2027), spécialité Science des Données & IA, avec une expérience pratique en machine learning, MLOps et systèmes LLM/RAG. " +
@@ -168,16 +195,39 @@ const FR = {
   ],
   projects: [
     {
-      title: "Garage Augmenté — Assistant multi-agents RAG de pré-diagnostic automobile",
+      title: "TurboWatch — Copilote de maintenance prédictive pour turboréacteurs",
+      right: "2026",
+      sub: [["Projet personnel — démo : "], ["dyaus2.github.io/turbowatch", L.twDemo], [" · code : "], ["github.com/Dyaus2/turbowatch", L.twRepo]],
+      bullets: [
+        "Prédiction de la durée de vie résiduelle (RUL) sur les données turboréacteurs NASA C-MAPSS : gradient boosting avec bande P10–P90 et CNN 1D (PyTorch) sur des variables causales normalisées par régime, partagées entre entraînement et production ; RMSE RUL sur le test de 15,5 cycles (CNN) / 16,3 (GBM), moyenne sur 5 graines, découpage par moteur.",
+        "Risque calibré et politique d'alarme k parmi n réglée sur une matrice de coûts : 97 % des pannes du jeu de test détectées avec une avance médiane de 36 cycles, à 2 % de fausses alarmes ; explication SHAP de chaque prédiction.",
+        "Copilote RAG de maintenance sur documents FAA/NASA (bge-small + BM25, RRF, reranking par cross-encoder) : réponses citées, refus hors périmètre ; bon passage classé premier sur 26 questions de test sur 26, y compris en exécution entièrement dans le navigateur (transformers.js).",
+        "MLOps et livraison : MLflow, détection de dérive PSI avec réentraînement champion/challenger (RMSE test FD003 20,7 → 15,0), API FastAPI + tableau de bord React/TypeScript avec rejeu en direct, Docker, CI GitHub Actions.",
+      ],
+      stack: "Stack : Python, scikit-learn, PyTorch, SHAP, MLflow, FastAPI, sentence-transformers, React, TypeScript, Docker",
+    },
+    {
+      title: "UnderHood (Garage Augmenté) — Assistant multi-agents de pré-diagnostic automobile (RAG)",
       right: "2026 – 2027",
       sub: "Projet d'équipe, ESPRIT — responsable de la base de connaissances et de la couche de recherche",
       bullets: [
-        "Pipeline RAG modulaire sur Qdrant : expansion de requêtes multilingue (français, anglais, arabe tunisien), recherche hybride dense BGE-M3 + BM25 fusionnée par reciprocal rank fusion, filtrage marque/modèle/année, reranking par cross-encoder et consultation exacte de 9 533 codes défaut OBD.",
-        "7 collecteurs Python reprenables (catalogues XML, API JSON, sitemaps, routes de données Next.js) : 2 019 manuels du propriétaire uniques (≈ 697 000 pages, 26 marques), 73 % de sources constructeurs officielles, 54 des 56 modèles prioritaires couverts (issus d'une étude du marché automobile tunisien, immatriculations 2015–2026).",
-        "Préparation du corpus : déduplication SHA-256, OCR Tesseract de ≈ 18 500 pages, normalisation des métadonnées véhicule en 364 familles de modèles, étiquetage thématique ; index principal de 98 000 unités (≈ 39 M tokens).",
-        "Service FastAPI pour le workflow n8n, banc d'ablation (hit@k, MRR) et paquet de transfert documenté (Docker Compose, scripts d'ingestion et d'évaluation) pour la machine GPU hébergeant l'index.",
+        "Corpus : 7 collecteurs Python reprenables : 2 019 manuels du propriétaire (≈ 697 000 pages, 26 marques, 73 % de sources officielles), couvrant 54 des 56 modèles prioritaires du marché tunisien. Déduplication SHA-256, OCR Tesseract (≈ 18 500 pages), 364 familles de modèles, index Qdrant de 101 417 passages.",
+        "Recherche : expansion de requêtes FR / EN / derja tunisienne et réécriture par LLM, recherche hybride BGE-M3 + BM25 (RRF), filtre marque/modèle/année, reranking par cross-encoder et consultation exacte de 9 533 codes OBD-II. Le tout est exposé en service FastAPI à l'agent de diagnostic (LangGraph).",
+        "Évaluation : ablation sur 40 questions (hit@5, MRR, jugement LLM en double aveugle) : le filtre véhicule fait passer le taux de bonnes réponses dans le bon manuel de 0 % à 72 % (MRR 0,63).",
       ],
-      stack: "Stack : Python, Qdrant, BGE-M3, BM25, PyMuPDF, Tesseract, FastAPI, Docker Compose, n8n",
+      stack: "Stack : Python, Qdrant, BGE-M3, BM25, FastAPI, LangGraph, PyMuPDF, Tesseract",
+    },
+    {
+      title: "DressMe — Assistant de mode personnel intelligent pour le marché tunisien",
+      right: "2026 – 2027",
+      sub: "Projet d'équipe (7 personnes, Advanced Data Science Project), ESPRIT — de la conception au prototype fonctionnel (API + application mobile)",
+      bullets: [
+        "Représentation du style : benchmark d'encodeurs sur Polyvore (152 785 articles, IC bootstrap à 95 %). Choix de Qwen3-VL-Embedding-2B, aussi précis que le 8B mais 3,7× plus rapide. « Fashion DNA » apprise par un Set Transformer entraîné en contrastif (InfoNCE).",
+        "Tenues personnalisées : tête de compatibilité par paire de catégories (AUC 0,852 contre 0,830 pour le cosinus seul). Génération par beam search selon la météo et l'occasion. Personnalisation par Thompson sampling avec prior de population, évaluée sur 40 personas simulées pendant 60 jours.",
+        "Vision et IA générative : segmentation SAM 3 et reconnaissance des vêtements sur photo (96,6 % de précision en remplissage automatique). Essayage virtuel par diffusion (Qwen Image Edit via ComfyUI). Styliste LLM local (Qwen 9B) dont chaque phrase est vérifiée contre les faits : 199 réponses sur 200 ancrées.",
+        "IA explicable et marché : contributions exactes de chaque critère au score ; cartes d'occlusion évaluées en fidélité (courbes deletion/insertion) ; concepts affichés seulement au-delà d'une AUC de 0,85 ; prix de seconde main prédits par LightGBM quantile et calibration conforme (couverture 80,0 % sur 423 k annonces), expliqués par TreeSHAP.",
+      ],
+      stack: "Stack : Python, PyTorch, FastAPI, LightGBM, llama.cpp, React Native (Expo)",
     },
     {
       title: "Kadastra — Plateforme d'intelligence immobilière basée sur l'IA",
@@ -197,15 +247,6 @@ const FR = {
       ],
     },
     {
-      title: "DressMe — Assistant de mode personnel intelligent pour le marché tunisien",
-      right: "2026 – 2027",
-      sub: "Projet d'équipe (Advanced Data Science Project), ESPRIT — phase de conception, Design Thinking",
-      bullets: [
-        "Recherche utilisateur (17 répondants, 6 personas) traduite en 5 objectifs métier et data science avec métriques et feuille de route en 3 versions ; architecture en 5 couches (passerelle FastAPI, Redis Streams, PostgreSQL/FAISS).",
-        "Spécification de 6 pipelines ML (ingestion YOLO + SAM 2 + Qwen3-VL, compatibilité de tenues BPR sur Polyvore, recommandeur Two-Tower + LightGBM, agent de revente ReAct) et d'une stratégie d'explicabilité (TreeSHAP, LIME, contrefactuels).",
-      ],
-    },
-    {
       title: "Analyse de séries temporelles — Dépenses de construction aux États-Unis",
       right: "2026",
       sub: "Projet de modélisation statistique en R",
@@ -218,7 +259,7 @@ const FR = {
     ["Langages", "Python, R, SQL, C/C++, Java, PHP"],
     ["ML / DL", "scikit-learn, XGBoost, PyTorch, TensorFlow, Keras ; détection d'anomalies, classification, calibration, validation croisée groupée ; vision par ordinateur (CNN, ViT, CLIP, BLIP) ; séries temporelles (ARIMA/SARIMA)"],
     ["LLM / RAG / NLP", "pipelines RAG, Qdrant, embeddings BGE-M3, BM25, recherche hybride, reranking par cross-encoder, évaluation hit@k / MRR, Transformers"],
-    ["MLOps", "réentraînement automatisé, registre de modèles, déploiement champion/challenger, surveillance de la dérive (PSI), critères de qualité, déploiement canari et retour arrière, pytest"],
+    ["MLOps", "réentraînement automatisé, registre de modèles, MLflow, déploiement champion/challenger, surveillance de la dérive (PSI), critères de qualité, déploiement canari et retour arrière, pytest"],
     ["Data", "pandas, NumPy, ETL, web scraping, OCR (Tesseract), SQLite, Power BI, Tableau"],
     ["Cloud & déploiement", "AWS (Cloud Foundations), Docker, Docker Compose, FastAPI, Django, Flask, Spring Boot, Symfony, API REST, n8n, Git"],
     ["Méthodologies", "Microsoft TDSP, CRISP-DM, Design Thinking, Agile/Scrum"],
@@ -238,12 +279,11 @@ const FR = {
     },
   ],
   certs: [
-    "AWS Cloud Foundations — Amazon Web Services (badge, novembre 2026)",
+    [["AWS Cloud Foundations — Amazon Web Services (badge, novembre 2026) — "], ["vérifier sur Credly", L.credly]],
     "Fundamentals of Deep Learning — NVIDIA (2026)",
     "Applications of AI for Anomaly Detection — NVIDIA (2026)",
     "Building Transformer-Based Natural Language Processing Applications — NVIDIA (2026)",
     "CCNA 2 : Switching, Routing, and Wireless Essentials (SRWE) — Cisco Networking Academy (2025)",
-    "[À COMPLÉTER — 3 certifications Hedera, prévues décembre 2026 : indiquer les intitulés exacts une fois obtenues, sinon supprimer avant envoi]",
   ],
   languages: "Arabe : langue maternelle | Français : courant (niveau avancé, usage professionnel) | Anglais : courant",
 };
